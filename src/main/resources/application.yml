@@ -1,0 +1,145 @@
+micronaut:
+  serde:
+    maximum-nesting-depth: 32768
+  application:
+    name: dcb
+  router:
+    static-resources:
+      swagger:
+        enabled: true
+        paths: classpath:META-INF/swagger
+        mapping: /openapi/**
+      swagger-ui:
+        enabled: true
+        paths: classpath:META-INF/swagger/views/swagger-ui
+        mapping: /openapi/ui/**
+      redoc:
+        paths: classpath:META-INF/swagger/views/redoc
+        mapping: /openapi/redoc/**
+  data:
+    pageable:
+      max-page-size: 1000
+
+  security:
+    authentication: idtoken
+    token:
+      jwt:
+        enabled: true
+        signatures.jwks.keycloak:
+          url: ${KEYCLOAK_CERT_URL:""}
+
+    intercept-url-map:
+      - pattern: "/openapi/**"
+        access:
+          - isAnonymous()
+      # - pattern: "/graphiql/**"
+      #   access:
+      #     - isAnonymous()
+      - pattern: "/graphql/**"
+        access:
+          - isAuthenticated()
+  http:
+    client:
+      read-timeout: PT1M
+      max-content-length: 20971520
+      
+  metrics:
+    enabled: true
+    export:
+      prometheus:
+        enabled: true
+        step: PT1M
+        descriptions: true
+
+endpoints:
+  prometheus:
+    sensitive: false
+  health:
+    enabled: true
+    sensitive: false # non-secured endpoint
+    details-visible: ANONYMOUS # show details for everyone
+    ingest:
+      enabled: true
+  info:
+    enabled: true
+    sensitive: false
+
+flyway:
+  enabled: true
+  datasources:
+    default:
+      enabled: true
+      # locations:
+      #   - classpath:db/migrations
+      # default-schema: r2dbc-poc
+      # url: ${DB_URL:`r2dbc:postgresql://localhost:5432/postgres`}
+      # username: ${DB_USER:`postgres`}
+      # password: ${DB_PASSWORD:`pass`}
+
+db:
+  host: localhost
+  port: 5432
+
+datasources:
+  default:
+    enabled: true
+    dialect: POSTGRES
+    driverClassName: org.postgresql.Driver
+    schema-generate: NONE
+    db-type: postgresql
+    minimumIdle: 0
+    maximumPoolSize: 2
+    reconnect: true
+    #username: "${db.username:}"
+    #password: "${db.password:}"
+
+r2dbc:
+  datasources:
+    default:
+      enabled: true
+      dialect: POSTGRES
+      # https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/
+      # Specify db-type so test resources knows what to provision
+      # db-type: postgresql
+      db-type: postgres
+      reconnect: true
+      # url: ${DB_URL:`r2dbc:postgresql://localhost:5432/postgres`}
+      # username: ${DB_USER:`postgres`}
+      # password: ${DB_PASSWORD:`pass`}
+      options:
+        driver: pool
+        protocol: postgres
+        poolName: r2dbc
+        maxSize: 20
+        initialSize: 5
+        # maxLifeTime: PT120M
+        # maxLifeTime: PT20M
+        maxIdleTime: PT240S
+        # maxAcquireTime: PT20S
+        validationQuery: "SELECT 1"
+        validationDepth: REMOTE
+      
+      # driver: postgresql
+      #url: "r2dbc:postgresql://${db.host}:${db.port}/${db.database:}"
+      #host: "${db.host:localhost}"
+      #username: "${db.username:}"
+      #password: "${db.password:}"
+      schema-generate: NONE
+
+
+# elasticsearch.httpHosts: http://localhost:9200,http://127.0.0.2:9200
+netty:
+  default:
+    allocator:
+      max-order: 3
+  # https://github.com/micronaut-projects/micronaut-core/discussions/5318
+  max-initial-line-length: 4096
+
+jackson:
+  date-format: "yyyy-MM-dd'T'HH:mm:ssZ"
+
+graphql:
+  enabled: true
+  # Disable graphiql because we have protected it using a jwt
+  graphiql: # enables the /graphiql endpoint to test calls against your graph.
+    enabled: false
