@@ -23,7 +23,7 @@
         <logger name="example.micronaut" level="DEBUG" />
 
 
-    <root level="debug">
+    <root level="info">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

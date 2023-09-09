@@ -23,5 +23,6 @@
 
 
 
+https://docs.oracle.com/en/graalvm/jdk/17/docs/reference-manual/llvm/#graalvm-llvm-runtime
 /home/ianibbo/.sdkman/candidates/java/17.0.8-graal/bin/gu  install llvm-toolchain
 

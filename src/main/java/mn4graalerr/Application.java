@@ -22,8 +22,7 @@ public class Application {
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) {
-	System.out.println("Start1");
-        log.info("Startr2");
+        log.info("Start");
         Micronaut.run(Application.class, args);
     }
 }
